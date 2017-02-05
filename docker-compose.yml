@@ -1,0 +1,24 @@
+version: "2"
+services:
+  kafka:
+    container_name: event_bus_kafka
+    image: wurstmeister/kafka
+    hostname: kafka
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "events:1:1"
+    ports:
+      - "9093:9092"
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    container_name: event_bus_zookeeper
+    image: oddpoet/zookeeper
+    hostname: zookeeper
+    command:
+      - "2181"
+    ports:
+      - "2181:2181"
