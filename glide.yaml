@@ -1,0 +1,3 @@
+package: github.com/rafaeljesus/kafka-event-bus
+import:
+- package: github.com/Shopify/sarama
