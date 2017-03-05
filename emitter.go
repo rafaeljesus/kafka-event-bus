@@ -1,4 +1,4 @@
-package eventbus
+package bus
 
 import (
 	"encoding/json"
@@ -35,7 +35,7 @@ func NewEmitter(ec EmitterConfig) (emitter Emitter, err error) {
 
 	address := ec.Address
 	if len(address) == 0 {
-		address = append(address, "localhost:9093")
+		address = append(address, "localhost:9092")
 	}
 
 	syncProducer, err := sarama.NewSyncProducer(address, config)
@@ -102,6 +102,8 @@ func (ee eventEmitter) EmitAsync(topic string, payload interface{}) (err error) 
 
 func newEmitterConfig(ec EmitterConfig) (config *sarama.Config) {
 	config = sarama.NewConfig()
+	config.Producer.Partitioner = sarama.NewRandomPartitioner
+	config.Producer.RequiredAcks = sarama.WaitForLocal
 
 	if ec.MaxRetry != 0 {
 		config.Producer.Retry.Max = ec.MaxRetry

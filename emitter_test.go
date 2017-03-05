@@ -1,14 +1,14 @@
-package eventbus
+package bus
 
 import (
 	"testing"
 )
 
 func TestNewEmitter(t *testing.T) {
-	expected := "localhost:9093"
+	expected := "localhost:9092"
 
 	emitter, err := NewEmitter(EmitterConfig{
-		Address: []string{"localhost:9093"},
+		Address: []string{"localhost:9092"},
 	})
 
 	if err != nil {
