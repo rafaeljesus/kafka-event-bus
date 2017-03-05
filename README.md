@@ -4,12 +4,7 @@
 
 ## Installation
 ```bash
-go get -u https://github.com/rafaeljesus/kafka-event-bus
-```
-
-## Environment Variables
-```bash
-export KAFKA_URL=localhost:9093
+go get -u github.com/rafaeljesus/kafka-event-bus
 ```
 
 ## Usage
@@ -20,51 +15,45 @@ The kafka-event-bus package exposes a interface for emitting and listening event
 import "github.com/rafaeljesus/kafka-event-bus"
 
 topic := "events"
-var event struct{}
-eventBus, _ := eventbus.NewEventBus()
+emitter, err := bus.NewEmitter(EmitterConfig{
+  Address:  "localhost:9092",
+  MaxRetry: 10,
+})
 
 e := event{}
-if err := eventBus.Emit(topic, &e); err != nil {
+if err = emitter.Emit(topic, &e); err != nil {
   // handle failure to emit message
 }
 
+// emitting messages on a async fashion
+if err = emitter.EmitAsync(topic, &e); err != nil {
+  // handle failure to emit message
+}
 ```
 
 ### Listener
 ```go
 import "github.com/rafaeljesus/kafka-event-bus"
 
-topic := "events"
-metricsChannel := "metrics"
-notificationsChannel := "notifications"
-eventBus, _ := eventbus.NewEventBus()
-
-if err := eventBus.On(topic, metricsHandler); err != nil {
+if err = bus.On(bus.ListenerConfig{
+  Topic:       "topic",
+  HandlerFunc: handler,
+  Partition:   0,
+}); err != nil {
   // handle failure to listen a message
 }
 
-if err := eventBus.On(topic, notificationsHandler); err != nil {
-  // handle failure to listen a message
-}
-
-func metricsHandler(payload []byte) (error) {
+func handler(message *bus.Message) (err error) {
   e := event{}
-  if err := json.Unmarshal(payload, &e); err != nil {
-    // handle failure
+  if err = message.DecodePayload(&e); err != nil {
+    // handle failure to listen a message
+    return
   }
-  // handle message
-  return nil
-}
 
-func notificationsHandler(payload []byte) (interface{}, error) {
-  e := event{}
-  if err := json.Unmarshal(payload, &e); err != nil {
-    // handle failure
-  }
   // handle message
-  return nil
-}
 
+  return
+}
 ```
 
 ## Contributing
@@ -76,7 +65,9 @@ func notificationsHandler(payload []byte) (interface{}, error) {
 
 ## Badges
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/rafaeljesus/nsq-event-bus)](https://goreportcard.com/report/github.com/rafaeljesus/nsq-event-bus)
+[![Build Status](https://circleci.com/gh/rafaeljesus/kafka-event-bus.svg?style=svg)](https://circleci.com/gh/rafaeljesus/kafka-event-bus)
+[![Go Report Card](https://goreportcard.com/badge/github.com/rafaeljesus/kafka-event-bus)](https://goreportcard.com/report/github.com/rafaeljesus/kafka-event-bus)
+[![Go Doc](https://godoc.org/github.com/rafaeljesus/kafka-event-bus?status.svg)](https://godoc.org/github.com/rafaeljesus/kafka-event-bus)
 
 ---
 
